@@ -1,0 +1,27 @@
+version: '3.8' # Version Docker Compose 
+services:
+  dev-database:
+    image: postgres:16.0
+    container_name: dev-database
+    ports:
+      - 5434:5432
+    environment:
+      POSTGRES_USR: postgres
+      POSTGRES_PASSWORD: Abc123456789
+      POSTGRES_DB: nestdb
+    networks:
+      - nestjs-networks
+networks:
+  nestjs-networks:
+
+    #Cteate container, network ,... from "docker composer" file:
+    # -d : detach/background mode
+    #>> docker compose up -d
+    #>> docker compose down (xóa container)
+    #if you want to start only specified service/container:
+    #>> docker compose up -d dev-database -d
+    #How to remove container + volumes
+    #>> docker compose rm dev-database --stop --force --volumes
+
+
+
