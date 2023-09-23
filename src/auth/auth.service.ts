@@ -17,10 +17,9 @@ export class AuthService {
     ) { }
 
     async register(body: RegisterDTO) {
-        console.log(body)
         const hashedPassword = await argon.hash(body.password);
         try {
-            const user = await this.prismaService.user.create({
+            await this.prismaService.user.create({
                 data: {
                     userName: body.userName,
                     email: body.email,
@@ -62,24 +61,40 @@ export class AuthService {
         if (!passwordMatched) {
             throw new ForbiddenException('Incorrect password')
         }
-        delete user.hashedPassword
-        const accessToken = await this.signJwtToken(user.id, user.email)
-        res.cookie('accessToken', accessToken)
-        return {
-            status: HttpStatus.OK,
-            user,
-            accessToken,
-        }
+        const tokens = await this.getTokens(user.id, user.email)
+        return tokens;
+
     }
-    async signJwtToken(userId: number, email: string): Promise<string> {
+
+    async refreshTokens(userId: number) {
+        const user = await this.prismaService.user.findUnique({
+            where: {
+                id: userId,
+            },
+        })
+        if (!user) {
+            throw new ForbiddenException('Access Denied')
+        }
+        const tokens = await this.getTokens(user.id, user.email);
+        return tokens;
+    }
+
+    private async getTokens(userId: number, email: string): Promise<{ accessToken: string; refreshToken: string; }> {
         const payload = {
             sub: userId,
             email
         }
-        const jwtString = await this.jwtService.signAsync(payload, {
-            expiresIn: '1h',
-            secret: this.configService.get('JWT_SECRET')
+        const accessToken = await this.jwtService.signAsync(payload, {
+            expiresIn: '15m',
+            secret: this.configService.get('JWT_ACCESS_SECRET')
         });
-        return jwtString;
+        const refreshToken = await this.jwtService.signAsync(payload, {
+            expiresIn: '7d',
+            secret: this.configService.get('JWT_REFRESH_SECRET')
+        });
+        return {
+            accessToken,
+            refreshToken,
+        };
     }
 }
