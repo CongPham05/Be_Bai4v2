@@ -17,7 +17,6 @@ export class UserController {
         return this.userService.detail(user)
     }
 
-
     @Roles('admin')
     @Get()
     getUsers() {

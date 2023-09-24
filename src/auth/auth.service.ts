@@ -1,5 +1,5 @@
 import { ConfigService } from '@nestjs/config';
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, Delete } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import * as argon from 'argon2';
@@ -61,9 +61,12 @@ export class AuthService {
         if (!passwordMatched) {
             throw new ForbiddenException('Incorrect password')
         }
+        delete (user.hashedPassword)
         const tokens = await this.getTokens(user.id, user.email)
-        return tokens;
-
+        return {
+            user,
+            tokens
+        }
     }
 
     async refreshTokens(userId: number) {
@@ -85,7 +88,7 @@ export class AuthService {
             email
         }
         const accessToken = await this.jwtService.signAsync(payload, {
-            expiresIn: '15m',
+            expiresIn: '15s',
             secret: this.configService.get('JWT_ACCESS_SECRET')
         });
         const refreshToken = await this.jwtService.signAsync(payload, {
