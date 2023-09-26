@@ -5,9 +5,7 @@ import { UpdateUserDTO } from './dto';
 
 @Injectable()
 export class UserService {
-    constructor(
-        private prismaService: PrismaService,
-    ) { }
+    constructor(private prismaService: PrismaService) { }
 
     async detail(user: User) {
         return {
