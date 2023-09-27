@@ -4,7 +4,7 @@ import { User } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import * as argon from 'argon2';
 import { PrismaService } from '../prisma/prisma.service';
-import { RegisterDTO, LoginDTO } from './dto';
+import { RegisterDTO, LoginDTO, ForgotPassword } from './dto';
 import { Response } from 'express';
 import { HttpStatus } from '@nestjs/common';
 
@@ -52,14 +52,14 @@ export class AuthService {
             }
         })
         if (!user) {
-            throw new ForbiddenException('User not found')
+            throw new ForbiddenException('User or password is incorrect')
         }
         const passwordMatched = await argon.verify(
             user.hashedPassword,
             body.password
         )
         if (!passwordMatched) {
-            throw new ForbiddenException('Incorrect password')
+            throw new ForbiddenException('User or password is incorrect')
         }
         delete (user.hashedPassword)
         const tokens = await this.getTokens(user.id, user.email)
@@ -68,7 +68,20 @@ export class AuthService {
             tokens
         }
     }
+    async forgotPassword(body: ForgotPassword) {
+        const user = await this.prismaService.user.findUnique({
+            where: {
+                email: body.email
+            }
+        })
+        if (!user) {
+            throw new ForbiddenException('That address is either invalid, not a verified primary email or is not associated with a personal user account. ')
+        }
+        return {
+            message: "Check your email for a link to reset your password. If it doesn’t appear within a few minutes, check your spam folder."
+        }
 
+    }
     async refreshTokens(userId: number) {
         const user = await this.prismaService.user.findUnique({
             where: {
@@ -88,7 +101,7 @@ export class AuthService {
             email
         }
         const accessToken = await this.jwtService.signAsync(payload, {
-            expiresIn: '1d',
+            expiresIn: '15s',
             secret: this.configService.get('JWT_ACCESS_SECRET')
         });
         const refreshToken = await this.jwtService.signAsync(payload, {

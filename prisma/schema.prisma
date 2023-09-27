@@ -33,6 +33,21 @@ model Todo {
   //relationship 
   user        User     @relation(fields: [userId], references: [id])
   userId      Int
+  status      Status[]
 
   @@map("todos")
+}
+
+model Status {
+  id        Int      @id @default(autoincrement())
+  content   String
+  colorId   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  //relationship 
+  Todo   Todo? @relation(fields: [todoId], references: [id])
+  todoId Int?
+
+  @@map("status")
 }
