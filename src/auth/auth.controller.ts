@@ -1,5 +1,5 @@
 import { AuthService } from './auth.service';
-import { Controller, Post, Body, Res, Get, Req, UseGuards, SetMetadata } from '@nestjs/common';
+import { Controller, Post, Body, Res, Get, Req, UseGuards, SetMetadata, Param, Patch } from '@nestjs/common';
 import { RegisterDTO, LoginDTO, ForgotPassword } from './dto';
 import { Response, Request } from 'express';
 import { RefreshTokenGuard } from './guard';
@@ -30,7 +30,21 @@ export class AuthController {
     }
 
     @Post('forgot-password')
-    forgotPassword(@Body() body: ForgotPassword) {
-        return this.authService.forgotPassword(body)
+    forgotPassword(
+        @Req() req: Request,
+        @Body() body: ForgotPassword
+    ) {
+        return this.authService.forgotPassword(body, req)
+    }
+
+
+    @Get('token-email/:token')
+    tokenMail(@Param() param: { token: string }) {
+        return this.authService.tokenMail(param.token)
+    }
+
+    @Patch('reset-password')
+    resetPassword(@Body() body: { password: string, email: string }) {
+        return this.authService.resetPassword(body)
     }
 }

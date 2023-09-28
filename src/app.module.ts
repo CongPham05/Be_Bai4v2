@@ -4,6 +4,7 @@ import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { TodoModule } from './todo/todos.module';
+import { MailModule } from './mail/mail.module';
 
 
 @Module({
@@ -13,6 +14,7 @@ import { TodoModule } from './todo/todos.module';
     AuthModule,
     PrismaModule,
     TodoModule,
+    MailModule,
   ],
   controllers: [],
   providers: [
