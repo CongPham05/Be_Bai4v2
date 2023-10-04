@@ -12,11 +12,6 @@ import { UpdateUserDTO } from './dto';
 export class UserController {
     constructor(private userService: UserService) { }
 
-    @Get('detail')
-    detail(@GetUser() user: User) {
-        return this.userService.detail(user)
-    }
-
     @Roles('admin')
     @Get()
     getUsers() {
@@ -25,23 +20,25 @@ export class UserController {
 
     @Roles('admin')
     @Get(':id')
-    getUserById(@Param('id') userId: number) {
+    getUserById(@Param('id', ParseIntPipe) userId: number) {
         return this.userService.getUserById(userId)
     }
-
-    @Patch()
-    updateUserById(
-        @Param('id', ParseIntPipe) userId: number,
-        @Body() updateUserDTO: UpdateUserDTO
-    ) {
-        return this.userService.updateUserById(userId, updateUserDTO)
-
-    }
-
 
     @Roles('admin')
     @Delete()
     deleteUserById(@Param('id', ParseIntPipe) userId: number) {
         return this.userService.deleteUserById(userId)
+    }
+
+    @Get('detail')
+    detail(@GetUser() user: User) {
+        return this.userService.detail(user)
+    }
+
+    @Patch(':id')
+    updateUserById(
+        @Param('id', ParseIntPipe) userId: number,
+        @Body() updateUserDTO: UpdateUserDTO) {
+        return this.userService.updateUserById(userId, updateUserDTO)
     }
 }

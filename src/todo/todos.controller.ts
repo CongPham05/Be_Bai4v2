@@ -34,7 +34,6 @@ export class TodoController {
         @Param('id', ParseIntPipe) todoId: number,
         @Body() updateTodoDTO: UpdateTodoDTO
     ) {
-        console.log({ todoId, updateTodoDTO })
         return this.todoService.updateTodoById(todoId, updateTodoDTO)
     }
 
