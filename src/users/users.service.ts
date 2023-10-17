@@ -39,7 +39,7 @@ export class UserService {
                 oldPassword
             )
             if (!passwordMatched) {
-                throw new ForbiddenException('Password is incorrect')
+                throw new ForbiddenException('Password old is incorrect')
             }
             const hashedPassword = await argon.hash(password);
             const user = await this.prismaService.user.update({

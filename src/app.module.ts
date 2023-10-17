@@ -5,6 +5,8 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { TodoModule } from './todo/todos.module';
 import { MailModule } from './mail/mail.module';
+import { EventsModule } from './events/events.module';
+import { ChatModule } from './chat/chat.module';
 
 
 @Module({
@@ -15,6 +17,8 @@ import { MailModule } from './mail/mail.module';
     PrismaModule,
     TodoModule,
     MailModule,
+    EventsModule,
+    ChatModule,
   ],
   controllers: [],
   providers: [
