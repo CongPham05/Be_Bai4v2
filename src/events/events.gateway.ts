@@ -7,46 +7,44 @@ import {
   WebSocketServer
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { ChatDTO } from './dto';
-import { ChatService } from 'src/chat/chat.service';
 
 @WebSocketGateway({ namespace: 'events' })
 export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
-  // constructor(private chatService: ChatService) { }
+
+  private activeUsers = [];
+
   @WebSocketServer()
   server: Server;
-
-  private readonly users: Map<string, Socket> = new Map();
-
-  // @SubscribeMessage('message')
-  // async handleMessage(client: any, @MessageBody() data) {
-  //   console.log(client)
-  //   console.log(data)
-
-  //   // await this.prismaService.message.create(payload);
-  //   // this.server.emit('messageToClient', data)
-  // }
-
-  @SubscribeMessage('joinRoom')
-  async joinRoom(client: Socket, data: { roomId: string }) {
-    client.join(data.roomId);
-  }
-
-  @SubscribeMessage('messageToRoom')
-  async message(client: Socket, data: { roomId: string, dataMessage: any }) {
-    console.log(data)
-    this.server.to(data.roomId).emit('messageToClient', data);
-  }
-
   handleConnection(client: Socket, ...args: any[]) {
     console.log(`Client connected: ${client.id}`);
-    this.users.set(client.id, client);
   }
 
   handleDisconnect(client: Socket) {
     console.log(`Client disconnected: ${client.id}`);
-    this.users.delete(client.id);
+    this.activeUsers = this.activeUsers.filter((user) => user.socketId !== client.id);
+    this.server.emit("get-users", this.activeUsers);
+  }
+
+  @SubscribeMessage('new-user-add')
+  async addUser(client: Socket, newUserId: number) {
+    if (!this.activeUsers.some((user) => user.userId === newUserId)) {
+      this.activeUsers.push(
+        {
+          userId: newUserId,
+          socketId: client.id
+        }
+      );
+    }
+    this.server.emit("get-users", this.activeUsers);
+  }
+
+  @SubscribeMessage('send-message')
+  async message(client: Socket, data: { receiverId: number }) {
+    const { receiverId } = data;
+    const user = this.activeUsers.find((user) => user.userId === receiverId);
+    if (user) {
+      this.server.to(user.socketId).emit("recieve-message", data);
+    }
   }
 }
 

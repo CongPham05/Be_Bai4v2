@@ -7,6 +7,7 @@ import { TodoModule } from './todo/todos.module';
 import { MailModule } from './mail/mail.module';
 import { EventsModule } from './events/events.module';
 import { ChatModule } from './chat/chat.module';
+import { MessageModule } from './message/message.module';
 
 
 @Module({
@@ -19,6 +20,7 @@ import { ChatModule } from './chat/chat.module';
     MailModule,
     EventsModule,
     ChatModule,
+    MessageModule,
   ],
   controllers: [],
   providers: [

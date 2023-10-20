@@ -1,1 +1,1 @@
-export * from './insert.message.dto'
+export * from './insert.chat.dto'
