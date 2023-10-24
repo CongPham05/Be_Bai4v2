@@ -7,6 +7,7 @@ import { ChatDTO } from './dto';
 @UseGuards(AccessJwtGruard)
 @Controller('chat')
 export class ChatController {
+
     constructor(private chatService: ChatService) { }
 
     @Post()
@@ -21,4 +22,5 @@ export class ChatController {
     findChat(@Param("firstId", ParseIntPipe) firstId: number, @Param("secondId", ParseIntPipe) secondId: number) {
         return this.chatService.findChat(firstId, secondId)
     }
+
 }

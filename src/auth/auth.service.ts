@@ -102,8 +102,6 @@ export class AuthService {
             }
         }
     }
-
-
     async resetPassword(body: { password: string, email: string }) {
         const { password, email } = body;
         const hashedPassword = await argon.hash(password);
@@ -133,14 +131,13 @@ export class AuthService {
         const tokens = await this.getTokens(user.id, user.email);
         return tokens;
     }
-
     private async getTokens(userId: number, email: string): Promise<{ accessToken: string; refreshToken: string; }> {
         const payload = {
             sub: userId,
             email
         }
         const accessToken = await this.jwtService.signAsync(payload, {
-            expiresIn: '1d',
+            expiresIn: '15s',
             secret: this.configService.get('JWT_ACCESS_SECRET')
         });
         const refreshToken = await this.jwtService.signAsync(payload, {

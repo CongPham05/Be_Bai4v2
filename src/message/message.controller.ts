@@ -1,14 +1,15 @@
-import { Body, Controller, Get, Post, ParseIntPipe, Param } from '@nestjs/common';
+import { Body, Controller, Get, Post, ParseIntPipe, Param, UseGuards } from '@nestjs/common';
 import { MessageService } from './message.service';
 import { MessageDTO } from './dto';
+import { AccessJwtGruard } from 'src/auth/guard';
 
+@UseGuards(AccessJwtGruard)
 @Controller('message')
 export class MessageController {
     constructor(private messageService: MessageService) { }
 
     @Post()
     addMessage(@Body() messageDTO: MessageDTO) {
-        console.log(messageDTO)
         return this.messageService.addMessage(messageDTO)
     }
 

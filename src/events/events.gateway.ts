@@ -1,4 +1,5 @@
 import {
+  ConnectedSocket,
   MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -12,9 +13,10 @@ import { Server, Socket } from 'socket.io';
 export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   private activeUsers = [];
-
   @WebSocketServer()
   server: Server;
+
+
   handleConnection(client: Socket, ...args: any[]) {
     console.log(`Client connected: ${client.id}`);
   }
@@ -40,15 +42,18 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('send-message')
   async message(client: Socket, data: { receiverId: number }) {
-    const { receiverId } = data;
-    const user = this.activeUsers.find((user) => user.userId === receiverId);
-    if (user) {
-      this.server.to(user.socketId).emit("recieve-message", data);
+    if (data && data.receiverId !== null) {
+      const { receiverId } = data;
+      const user = this.activeUsers.find((user) => user.userId === receiverId);
+      if (user) {
+        this.server.to(user.socketId).emit("recieve-message", data);
+      }
     }
+    //  else {
+    //   console.error("Invalid data: 'receiverId' is null.");
+    // }
   }
 }
 
-// @SubscribeMessage('typing')
-// async typing() {
 
 
